@@ -820,17 +820,14 @@ def decompose_interp(indexes_coords):
     ]
     partial_dest_dims = []
     partial_indexes_coords = {}
-    for i, index_coords in enumerate(indexes_coords.items()):
-        partial_indexes_coords.update([index_coords])
+    for i, (dest_dim, (index, coords)) in enumerate(zip(dest_dims, indexes_coords.items())):
+        partial_indexes_coords[index] = coords
 
-        if i == len(dest_dims) - 1:
-            break
-
-        partial_dest_dims += [dest_dims[i]]
-        other_dims = dest_dims[i + 1 :]
+        partial_dest_dims.append(dest_dim)
+        remaining_dest_dims = dest_dims[i + 1 :]
 
         s_partial_dest_dims = {dim for dims in partial_dest_dims for dim in dims}
-        s_other_dims = {dim for dims in other_dims for dim in dims}
+        s_other_dims = {dim for dims in remaining_dest_dims for dim in dims}
 
         if not s_partial_dest_dims.intersection(s_other_dims):
             # this interpolation is orthogonal to the rest
