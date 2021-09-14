@@ -115,6 +115,14 @@ if TYPE_CHECKING:
     except ImportError:
         Delayed = None
 
+        
+def sleep():
+    import time
+    
+    time.sleep(3)
+
+
+sleep()
 
 # list of attributes of pd.DatetimeIndex that are ndarrays of time info
 _DATETIMEINDEX_COMPONENTS = [
