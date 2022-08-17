@@ -67,3 +67,8 @@ repos:
     rev: ebf0b5e44d67f8beaa1cd13a0d0393ea04c6058d
     hooks:
     - id: validate-cff
+-   repo: https://github.com/terrencepreilly/darglint
+    rev: master
+    hooks:
+    - id: darglint
+      args: "--docstring-style numpy"
