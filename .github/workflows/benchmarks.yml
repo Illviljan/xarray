@@ -1,3 +1,8 @@
+# This CI configuration for relative benchmarks is based on the research done
+# for scikit-image's implementation available here:
+# https://github.com/scikit-image/scikit-image/blob/main/.github/workflows/benchmarks.yml
+# Blog post with the rationale: https://labs.quansight.org/blog/2021/08/github-actions-benchmarks/
+
 name: Benchmark
 
 on:
@@ -9,7 +14,7 @@ jobs:
   benchmark:
     if: ${{ contains( github.event.pull_request.labels.*.name, 'run-benchmark') && github.event_name == 'pull_request' || contains( github.event.pull_request.labels.*.name, 'topic-performance') && github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
     name: Linux
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
       ASV_DIR: "./asv_bench"
       CONDA_ENV_FILE: ci/requirements/environment.yml
@@ -43,18 +48,23 @@ jobs:
           ASV_SKIP_SLOW: 1
         run: |
           set -x
+
           # ID this runner
           asv machine --yes
+
           echo "Baseline:  ${{ github.event.pull_request.base.sha }} (${{ github.event.pull_request.base.label }})"
           echo "Contender: ${GITHUB_SHA} (${{ github.event.pull_request.head.label }})"
+
           # Use mamba for env creation
           # export CONDA_EXE=$(which mamba)
           export CONDA_EXE=$(which conda)
+
           # Run benchmarks for current commit against base
           ASV_OPTIONS="--split --show-stderr --factor $ASV_FACTOR"
           asv continuous $ASV_OPTIONS ${{ github.event.pull_request.base.sha }} ${GITHUB_SHA} \
               | sed "/Traceback \|failed$\|PERFORMANCE DECREASED/ s/^/::error::/" \
               | tee benchmarks.log
+
           # Report and export results for subsequent steps
           if grep "Traceback \|failed\|PERFORMANCE DECREASED" benchmarks.log > /dev/null ; then
               exit 1
