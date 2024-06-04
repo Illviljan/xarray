@@ -3,8 +3,6 @@
 publication date. Compare it against requirements/min-all-deps.yml to verify the
 policy on obsolete dependencies is being followed. Print a pretty report :)
 """
-from __future__ import annotations
-
 import itertools
 import sys
 from collections.abc import Iterator
@@ -23,12 +21,12 @@ IGNORE_DEPS = {
     "isort",
     "mypy",
     "pip",
+    "setuptools",
     "pytest",
     "pytest-cov",
     "pytest-env",
-    "pytest-timeout",
     "pytest-xdist",
-    "setuptools",
+    "pytest-timeout",
 }
 
 POLICY_MONTHS = {"python": 30, "numpy": 18}
@@ -133,7 +131,7 @@ def process_pkg(
     - publication date of version suggested by policy (YYYY-MM-DD)
     - status ("<", "=", "> (!)")
     """
-    print(f"Analyzing {pkg}...")
+    print("Analyzing %s..." % pkg)
     versions = query_conda(pkg)
 
     try:
@@ -162,11 +160,11 @@ def process_pkg(
         status = "<"
     elif (req_major, req_minor) > (policy_major, policy_minor):
         status = "> (!)"
-        delta = relativedelta(datetime.now(), req_published).normalized()
+        delta = relativedelta(datetime.now(), policy_published_actual).normalized()
         n_months = delta.years * 12 + delta.months
         warning(
-            f"Package is too new: {pkg}={req_major}.{req_minor} was "
-            f"published on {req_published:%Y-%m-%d} "
+            f"Package is too new: {pkg}={policy_major}.{policy_minor} was "
+            f"published on {versions[policy_major, policy_minor]:%Y-%m-%d} "
             f"which was {n_months} months ago (policy is {policy_months} months)"
         )
     else:

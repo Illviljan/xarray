@@ -50,8 +50,7 @@ nosetests.xml
 dask-worker-space/
 
 # asv environments
-asv_bench/.asv
-asv_bench/pkgs
+.asv
 
 # Translations
 *.mo
@@ -69,7 +68,7 @@ asv_bench/pkgs
 
 # xarray specific
 doc/_build
-doc/generated/
+generated/
 xarray/tests/data/*.grib.*.idx
 
 # Sync tools

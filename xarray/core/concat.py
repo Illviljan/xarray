@@ -8,7 +8,6 @@ import pandas as pd
 
 from xarray.core import dtypes, utils
 from xarray.core.alignment import align, reindex_variables
-from xarray.core.coordinates import Coordinates
 from xarray.core.duck_array_ops import lazy_array_equiv
 from xarray.core.indexes import Index, PandasIndex
 from xarray.core.merge import (
@@ -43,8 +42,8 @@ def concat(
     fill_value: object = dtypes.NA,
     join: JoinOptions = "outer",
     combine_attrs: CombineAttrsOptions = "override",
-    create_index_for_new_dim: bool = True,
-) -> T_Dataset: ...
+) -> T_Dataset:
+    ...
 
 
 @overload
@@ -58,8 +57,8 @@ def concat(
     fill_value: object = dtypes.NA,
     join: JoinOptions = "outer",
     combine_attrs: CombineAttrsOptions = "override",
-    create_index_for_new_dim: bool = True,
-) -> T_DataArray: ...
+) -> T_DataArray:
+    ...
 
 
 def concat(
@@ -72,7 +71,6 @@ def concat(
     fill_value=dtypes.NA,
     join: JoinOptions = "outer",
     combine_attrs: CombineAttrsOptions = "override",
-    create_index_for_new_dim: bool = True,
 ):
     """Concatenate xarray objects along a new or existing dimension.
 
@@ -166,8 +164,6 @@ def concat(
 
         If a callable, it must expect a sequence of ``attrs`` dicts and a context object
         as its only parameters.
-    create_index_for_new_dim : bool, default: True
-        Whether to create a new ``PandasIndex`` object when the objects being concatenated contain scalar variables named ``dim``.
 
     Returns
     -------
@@ -183,65 +179,46 @@ def concat(
     ...     np.arange(6).reshape(2, 3), [("x", ["a", "b"]), ("y", [10, 20, 30])]
     ... )
     >>> da
-    <xarray.DataArray (x: 2, y: 3)> Size: 48B
+    <xarray.DataArray (x: 2, y: 3)>
     array([[0, 1, 2],
            [3, 4, 5]])
     Coordinates:
-      * x        (x) <U1 8B 'a' 'b'
-      * y        (y) int64 24B 10 20 30
+      * x        (x) <U1 'a' 'b'
+      * y        (y) int64 10 20 30
 
     >>> xr.concat([da.isel(y=slice(0, 1)), da.isel(y=slice(1, None))], dim="y")
-    <xarray.DataArray (x: 2, y: 3)> Size: 48B
+    <xarray.DataArray (x: 2, y: 3)>
     array([[0, 1, 2],
            [3, 4, 5]])
     Coordinates:
-      * x        (x) <U1 8B 'a' 'b'
-      * y        (y) int64 24B 10 20 30
+      * x        (x) <U1 'a' 'b'
+      * y        (y) int64 10 20 30
 
     >>> xr.concat([da.isel(x=0), da.isel(x=1)], "x")
-    <xarray.DataArray (x: 2, y: 3)> Size: 48B
+    <xarray.DataArray (x: 2, y: 3)>
     array([[0, 1, 2],
            [3, 4, 5]])
     Coordinates:
-      * x        (x) <U1 8B 'a' 'b'
-      * y        (y) int64 24B 10 20 30
+      * x        (x) <U1 'a' 'b'
+      * y        (y) int64 10 20 30
 
     >>> xr.concat([da.isel(x=0), da.isel(x=1)], "new_dim")
-    <xarray.DataArray (new_dim: 2, y: 3)> Size: 48B
+    <xarray.DataArray (new_dim: 2, y: 3)>
     array([[0, 1, 2],
            [3, 4, 5]])
     Coordinates:
-        x        (new_dim) <U1 8B 'a' 'b'
-      * y        (y) int64 24B 10 20 30
+        x        (new_dim) <U1 'a' 'b'
+      * y        (y) int64 10 20 30
     Dimensions without coordinates: new_dim
 
     >>> xr.concat([da.isel(x=0), da.isel(x=1)], pd.Index([-90, -100], name="new_dim"))
-    <xarray.DataArray (new_dim: 2, y: 3)> Size: 48B
+    <xarray.DataArray (new_dim: 2, y: 3)>
     array([[0, 1, 2],
            [3, 4, 5]])
     Coordinates:
-        x        (new_dim) <U1 8B 'a' 'b'
-      * y        (y) int64 24B 10 20 30
-      * new_dim  (new_dim) int64 16B -90 -100
-
-    # Concatenate a scalar variable along a new dimension of the same name with and without creating a new index
-
-    >>> ds = xr.Dataset(coords={"x": 0})
-    >>> xr.concat([ds, ds], dim="x")
-    <xarray.Dataset> Size: 16B
-    Dimensions:  (x: 2)
-    Coordinates:
-      * x        (x) int64 16B 0 0
-    Data variables:
-        *empty*
-
-    >>> xr.concat([ds, ds], dim="x").indexes
-    Indexes:
-        x        Index([0, 0], dtype='int64', name='x')
-
-    >>> xr.concat([ds, ds], dim="x", create_index_for_new_dim=False).indexes
-    Indexes:
-        *empty*
+        x        (new_dim) <U1 'a' 'b'
+      * y        (y) int64 10 20 30
+      * new_dim  (new_dim) int64 -90 -100
     """
     # TODO: add ignore_index arguments copied from pandas.concat
     # TODO: support concatenating scalar coordinates even if the concatenated
@@ -270,7 +247,6 @@ def concat(
             fill_value=fill_value,
             join=join,
             combine_attrs=combine_attrs,
-            create_index_for_new_dim=create_index_for_new_dim,
         )
     elif isinstance(first_obj, Dataset):
         return _dataset_concat(
@@ -283,7 +259,6 @@ def concat(
             fill_value=fill_value,
             join=join,
             combine_attrs=combine_attrs,
-            create_index_for_new_dim=create_index_for_new_dim,
         )
     else:
         raise TypeError(
@@ -340,7 +315,7 @@ def _calc_concat_over(datasets, dim, dim_names, data_vars: T_DataVars, coords, c
                 if dim in ds:
                     ds = ds.set_coords(dim)
         concat_over.update(k for k, v in ds.variables.items() if dim in v.dims)
-        concat_dim_lengths.append(ds.sizes.get(dim, 1))
+        concat_dim_lengths.append(ds.dims.get(dim, 1))
 
     def process_subset_opt(opt, subset):
         if isinstance(opt, str):
@@ -456,7 +431,7 @@ def _parse_datasets(
     variables_order: dict[Hashable, Variable] = {}  # variables in order of appearance
 
     for ds in datasets:
-        dims_sizes.update(ds.sizes)
+        dims_sizes.update(ds.dims)
         all_coord_names.update(ds.coords)
         data_vars.update(ds.data_vars)
         variables_order.update(ds.variables)
@@ -466,7 +441,7 @@ def _parse_datasets(
             if dim in dims:
                 continue
 
-            if dim in ds.coords and dim not in dim_coords:
+            if dim not in dim_coords:
                 dim_coords[dim] = ds.coords[dim].variable
         dims = dims | set(ds.dims)
 
@@ -483,7 +458,6 @@ def _dataset_concat(
     fill_value: Any = dtypes.NA,
     join: JoinOptions = "outer",
     combine_attrs: CombineAttrsOptions = "override",
-    create_index_for_new_dim: bool = True,
 ) -> T_Dataset:
     """
     Concatenate a sequence of datasets along a new or existing dimension
@@ -517,6 +491,7 @@ def _dataset_concat(
         datasets
     )
     dim_names = set(dim_coords)
+    unlabeled_dims = dim_names - coord_names
 
     both_data_and_coords = coord_names & data_names
     if both_data_and_coords:
@@ -529,10 +504,7 @@ def _dataset_concat(
 
     # case where concat dimension is a coordinate or data_var but not a dimension
     if (dim in coord_names or dim in data_names) and dim not in dim_names:
-        datasets = [
-            ds.expand_dims(dim, create_index_for_new_dim=create_index_for_new_dim)
-            for ds in datasets
-        ]
+        datasets = [ds.expand_dims(dim) for ds in datasets]
 
     # determine which variables to concatenate
     concat_over, equals, concat_dim_lengths = _calc_concat_over(
@@ -540,7 +512,7 @@ def _dataset_concat(
     )
 
     # determine which variables to merge, and then merge them according to compat
-    variables_to_merge = (coord_names | data_names) - concat_over
+    variables_to_merge = (coord_names | data_names) - concat_over - unlabeled_dims
 
     result_vars = {}
     result_indexes = {}
@@ -564,10 +536,9 @@ def _dataset_concat(
     result_encoding = datasets[0].encoding
 
     # check that global attributes are fixed across all datasets if necessary
-    if compat == "identical":
-        for ds in datasets[1:]:
-            if not utils.dict_equiv(ds.attrs, result_attrs):
-                raise ValueError("Dataset global attributes not equal.")
+    for ds in datasets[1:]:
+        if compat == "identical" and not utils.dict_equiv(ds.attrs, result_attrs):
+            raise ValueError("Dataset global attributes not equal.")
 
     # we've already verified everything is consistent; now, calculate
     # shared dimension sizes so we can expand the necessary variables
@@ -597,8 +568,7 @@ def _dataset_concat(
                 var = ds._variables[name]
                 if not var.dims:
                     data = var.set_dims(dim).values
-                    if create_index_for_new_dim:
-                        yield PandasIndex(data, dim, coord_dtype=var.dtype)
+                    yield PandasIndex(data, dim, coord_dtype=var.dtype)
 
     # create concatenation index, needed for later reindexing
     file_start_indexes = np.append(0, np.cumsum(concat_dim_lengths))
@@ -677,33 +647,29 @@ def _dataset_concat(
             # preserves original variable order
             result_vars[name] = result_vars.pop(name)
 
-    absent_coord_names = coord_names - set(result_vars)
+    result = type(datasets[0])(result_vars, attrs=result_attrs)
+
+    absent_coord_names = coord_names - set(result.variables)
     if absent_coord_names:
         raise ValueError(
             f"Variables {absent_coord_names!r} are coordinates in some datasets but not others."
         )
+    result = result.set_coords(coord_names)
+    result.encoding = result_encoding
 
-    result_data_vars = {}
-    coord_vars = {}
-    for name, result_var in result_vars.items():
-        if name in coord_names:
-            coord_vars[name] = result_var
-        else:
-            result_data_vars[name] = result_var
+    result = result.drop_vars(unlabeled_dims, errors="ignore")
 
     if index is not None:
+        # add concat index / coordinate last to ensure that its in the final Dataset
         if dim_var is not None:
             index_vars = index.create_variables({dim: dim_var})
         else:
             index_vars = index.create_variables()
-
-        coord_vars[dim] = index_vars[dim]
+        result[dim] = index_vars[dim]
         result_indexes[dim] = index
 
-    coords_obj = Coordinates(coord_vars, indexes=result_indexes)
-
-    result = type(datasets[0])(result_data_vars, coords=coords_obj, attrs=result_attrs)
-    result.encoding = result_encoding
+    # TODO: add indexes at Dataset creation (when it is supported)
+    result = result._overwrite_indexes(result_indexes)
 
     return result
 
@@ -718,7 +684,6 @@ def _dataarray_concat(
     fill_value: object = dtypes.NA,
     join: JoinOptions = "outer",
     combine_attrs: CombineAttrsOptions = "override",
-    create_index_for_new_dim: bool = True,
 ) -> T_DataArray:
     from xarray.core.dataarray import DataArray
 
@@ -755,7 +720,6 @@ def _dataarray_concat(
         fill_value=fill_value,
         join=join,
         combine_attrs=combine_attrs,
-        create_index_for_new_dim=create_index_for_new_dim,
     )
 
     merged_attrs = merge_attrs([da.attrs for da in arrays], combine_attrs)

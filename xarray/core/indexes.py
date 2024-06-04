@@ -632,8 +632,7 @@ class PandasIndex(Index):
         # the checks below.
 
         # preserve wrapped pd.Index (if any)
-        # accessing `.data` can load data from disk, so we only access if needed
-        data = getattr(var._data, "array") if hasattr(var._data, "array") else var.data
+        data = getattr(var._data, "array", var.data)
         # multi-index level variable: get level index
         if isinstance(var._data, PandasMultiIndexingAdapter):
             level = var._data.level
@@ -1017,13 +1016,6 @@ class PandasMultiIndex(PandasIndex):
 
     def unstack(self) -> tuple[dict[Hashable, Index], pd.MultiIndex]:
         clean_index = remove_unused_levels_categories(self.index)
-
-        if not clean_index.is_unique:
-            raise ValueError(
-                "Cannot unstack MultiIndex containing duplicates. Make sure entries "
-                f"are unique, e.g., by  calling ``.drop_duplicates('{self.dim}')``, "
-                "before unstacking."
-            )
 
         new_indexes: dict[Hashable, Index] = {}
         for name, lev in zip(clean_index.names, clean_index.levels):

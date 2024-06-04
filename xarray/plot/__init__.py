@@ -6,7 +6,6 @@ Or use the methods on a DataArray or Dataset:
     DataArray.plot._____
     Dataset.plot._____
 """
-
 from xarray.plot.dataarray_plot import (
     contour,
     contourf,

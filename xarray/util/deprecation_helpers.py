@@ -119,7 +119,7 @@ def _deprecate_positional_args(version) -> Callable[[T], T]:
     return _decorator
 
 
-def deprecate_dims(func: T, old_name="dims") -> T:
+def deprecate_dims(func: T) -> T:
     """
     For functions that previously took `dims` as a kwarg, and have now transitioned to
     `dim`. This decorator will issue a warning if `dims` is passed while forwarding it
@@ -128,15 +128,15 @@ def deprecate_dims(func: T, old_name="dims") -> T:
 
     @wraps(func)
     def wrapper(*args, **kwargs):
-        if old_name in kwargs:
+        if "dims" in kwargs:
             emit_user_level_warning(
-                f"The `{old_name}` argument has been renamed to `dim`, and will be removed "
+                "The `dims` argument has been renamed to `dim`, and will be removed "
                 "in the future. This renaming is taking place throughout xarray over the "
                 "next few releases.",
                 # Upgrade to `DeprecationWarning` in the future, when the renaming is complete.
                 PendingDeprecationWarning,
             )
-            kwargs["dim"] = kwargs.pop(old_name)
+            kwargs["dim"] = kwargs.pop("dims")
         return func(*args, **kwargs)
 
     # We're quite confident we're just returning `T` from this function, so it's fine to ignore typing

@@ -1,21 +1,18 @@
 from __future__ import annotations
 
-from importlib.metadata import EntryPoint
 from typing import Any
 
 import numpy as np
 import pytest
 
-from xarray.core.types import T_Chunks, T_DuckArray, T_NormalizedChunks
-from xarray.namedarray._typing import _Chunks
-from xarray.namedarray.daskmanager import DaskManager
-from xarray.namedarray.parallelcompat import (
+from xarray.core.daskmanager import DaskManager
+from xarray.core.parallelcompat import (
     ChunkManagerEntrypoint,
     get_chunked_array_type,
     guess_chunkmanager,
     list_chunkmanagers,
-    load_chunkmanagers,
 )
+from xarray.core.types import T_Chunks, T_DuckArray, T_NormalizedChunks
 from xarray.tests import has_dask, requires_dask
 
 
@@ -79,7 +76,7 @@ class DummyChunkManager(ChunkManagerEntrypoint):
         return normalize_chunks(chunks, shape, limit, dtype, previous_chunks)
 
     def from_array(
-        self, data: T_DuckArray | np.typing.ArrayLike, chunks: _Chunks, **kwargs
+        self, data: T_DuckArray | np.typing.ArrayLike, chunks: T_Chunks, **kwargs
     ) -> DummyChunkedArray:
         from dask import array as da
 
@@ -134,14 +131,14 @@ def register_dummy_chunkmanager(monkeypatch):
     This preserves the presence of the existing DaskManager, so a test that relies on this and DaskManager both being
     returned from list_chunkmanagers() at once would still work.
 
-    The monkeypatching changes the behavior of list_chunkmanagers when called inside xarray.namedarray.parallelcompat,
+    The monkeypatching changes the behavior of list_chunkmanagers when called inside xarray.core.parallelcompat,
     but not when called from this tests file.
     """
     # Should include DaskManager iff dask is available to be imported
     preregistered_chunkmanagers = list_chunkmanagers()
 
     monkeypatch.setattr(
-        "xarray.namedarray.parallelcompat.list_chunkmanagers",
+        "xarray.core.parallelcompat.list_chunkmanagers",
         lambda: {"dummy": DummyChunkManager()} | preregistered_chunkmanagers,
     )
     yield
@@ -220,13 +217,3 @@ class TestGetChunkedArrayType:
 
         with pytest.raises(TypeError, match="received multiple types"):
             get_chunked_array_type(*[dask_arr, dummy_arr])
-
-
-def test_bogus_entrypoint() -> None:
-    # Create a bogus entry-point as if the user broke their setup.cfg
-    # or is actively developing their new chunk manager
-    entry_point = EntryPoint(
-        "bogus", "xarray.bogus.doesnotwork", "xarray.chunkmanagers"
-    )
-    with pytest.warns(UserWarning, match="Failed to load chunk manager"):
-        assert len(load_chunkmanagers([entry_point])) == 0

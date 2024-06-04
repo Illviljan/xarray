@@ -28,6 +28,7 @@ dependencies:
   - pip
   - pooch
   - pydap
+  - pynio
   - rasterio
   - scipy
   - seaborn

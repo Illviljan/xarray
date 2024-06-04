@@ -5,7 +5,6 @@ Useful for:
 * building tutorials in the documentation.
 
 """
-
 from __future__ import annotations
 
 import os

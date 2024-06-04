@@ -9,7 +9,6 @@ import pytest
 from packaging.version import Version
 
 import xarray as xr
-from xarray.coding.cftime_offsets import _new_to_legacy_freq
 from xarray.core.pdcompat import _convert_base_to_offset
 from xarray.core.resample_cftime import CFTimeGrouper
 
@@ -26,7 +25,7 @@ cftime = pytest.importorskip("cftime")
 FREQS = [
     ("8003D", "4001D"),
     ("8003D", "16006D"),
-    ("8003D", "21YS"),
+    ("8003D", "21AS"),
     ("6h", "3h"),
     ("6h", "12h"),
     ("6h", "400min"),
@@ -36,21 +35,21 @@ FREQS = [
     ("3MS", "MS"),
     ("3MS", "6MS"),
     ("3MS", "85D"),
-    ("7ME", "3ME"),
-    ("7ME", "14ME"),
-    ("7ME", "2QS-APR"),
+    ("7M", "3M"),
+    ("7M", "14M"),
+    ("7M", "2QS-APR"),
     ("43QS-AUG", "21QS-AUG"),
     ("43QS-AUG", "86QS-AUG"),
-    ("43QS-AUG", "11YE-JUN"),
-    ("11QE-JUN", "5QE-JUN"),
-    ("11QE-JUN", "22QE-JUN"),
-    ("11QE-JUN", "51MS"),
-    ("3YS-MAR", "YS-MAR"),
-    ("3YS-MAR", "6YS-MAR"),
-    ("3YS-MAR", "14QE-FEB"),
-    ("7YE-MAY", "3YE-MAY"),
-    ("7YE-MAY", "14YE-MAY"),
-    ("7YE-MAY", "85ME"),
+    ("43QS-AUG", "11A-JUN"),
+    ("11Q-JUN", "5Q-JUN"),
+    ("11Q-JUN", "22Q-JUN"),
+    ("11Q-JUN", "51MS"),
+    ("3AS-MAR", "AS-MAR"),
+    ("3AS-MAR", "6AS-MAR"),
+    ("3AS-MAR", "14Q-FEB"),
+    ("7A-MAY", "3A-MAY"),
+    ("7A-MAY", "14A-MAY"),
+    ("7A-MAY", "85M"),
 ]
 
 
@@ -116,7 +115,6 @@ def da(index) -> xr.DataArray:
     )
 
 
-@pytest.mark.filterwarnings("ignore:.*the `(base|loffset)` parameter to resample")
 @pytest.mark.parametrize("freqs", FREQS, ids=lambda x: "{}->{}".format(*x))
 @pytest.mark.parametrize("closed", [None, "left", "right"])
 @pytest.mark.parametrize("label", [None, "left", "right"])
@@ -138,11 +136,9 @@ def test_resample(freqs, closed, label, base, offset) -> None:
     start = "2000-01-01T12:07:01"
     loffset = "12h"
     origin = "start"
-
-    datetime_index = pd.date_range(
-        start=start, periods=5, freq=_new_to_legacy_freq(initial_freq)
-    )
-    cftime_index = xr.cftime_range(start=start, periods=5, freq=initial_freq)
+    index_kwargs = dict(start=start, periods=5, freq=initial_freq)
+    datetime_index = pd.date_range(**index_kwargs)
+    cftime_index = xr.cftime_range(**index_kwargs)
     da_datetimeindex = da(datetime_index)
     da_cftimeindex = da(cftime_index)
 
@@ -171,7 +167,7 @@ def test_resample(freqs, closed, label, base, offset) -> None:
         ("MS", "left"),
         ("QE", "right"),
         ("QS", "left"),
-        ("YE", "right"),
+        ("Y", "right"),
         ("YS", "left"),
     ],
 )
@@ -181,7 +177,6 @@ def test_closed_label_defaults(freq, expected) -> None:
 
 
 @pytest.mark.filterwarnings("ignore:Converting a CFTimeIndex")
-@pytest.mark.filterwarnings("ignore:.*the `(base|loffset)` parameter to resample")
 @pytest.mark.parametrize(
     "calendar", ["gregorian", "noleap", "all_leap", "360_day", "julian"]
 )
@@ -214,7 +209,6 @@ class DateRangeKwargs(TypedDict):
     freq: str
 
 
-@pytest.mark.filterwarnings("ignore:.*the `(base|loffset)` parameter to resample")
 @pytest.mark.parametrize("closed", ["left", "right"])
 @pytest.mark.parametrize(
     "origin",
@@ -239,7 +233,6 @@ def test_origin(closed, origin) -> None:
     )
 
 
-@pytest.mark.filterwarnings("ignore:.*the `(base|loffset)` parameter to resample")
 def test_base_and_offset_error():
     cftime_index = xr.cftime_range("2000", periods=5)
     da_cftime = da(cftime_index)
@@ -283,7 +276,6 @@ def test_resample_loffset_cftimeindex(loffset) -> None:
     xr.testing.assert_identical(result, expected)
 
 
-@pytest.mark.filterwarnings("ignore:.*the `(base|loffset)` parameter to resample")
 def test_resample_invalid_loffset_cftimeindex() -> None:
     times = xr.cftime_range("2000-01-01", freq="6h", periods=10)
     da = xr.DataArray(np.arange(10), [("time", times)])
