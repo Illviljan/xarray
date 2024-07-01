@@ -2037,17 +2037,17 @@ class TestDataArrayResample:
         array = DataArray(np.arange(2), [("time", times)])
 
         # Forward fill
-        actual = array.resample(time="6h").ffill(tolerance="12h")  # type: ignore[arg-type] # TODO: tolerance also allows strings, same issue in .reindex.
+        actual = array.resample(time="6h").ffill(tolerance="12h")
         expected = DataArray([0.0, 0.0, 0.0, np.nan, 1.0], [("time", times_upsampled)])
         assert_identical(expected, actual)
 
         # Backward fill
-        actual = array.resample(time="6h").bfill(tolerance="12h")  # type: ignore[arg-type] # TODO: tolerance also allows strings, same issue in .reindex.
+        actual = array.resample(time="6h").bfill(tolerance="12h")
         expected = DataArray([0.0, np.nan, 1.0, 1.0, 1.0], [("time", times_upsampled)])
         assert_identical(expected, actual)
 
         # Nearest
-        actual = array.resample(time="6h").nearest(tolerance="6h")  # type: ignore[arg-type] # TODO: tolerance also allows strings, same issue in .reindex.
+        actual = array.resample(time="6h").nearest(tolerance="6h")
         expected = DataArray([0, 0, np.nan, 1, 1], [("time", times_upsampled)])
         assert_identical(expected, actual)
 
@@ -2074,13 +2074,18 @@ class TestDataArrayResample:
             "slinear",
             "quadratic",
             "cubic",
+            "polynomial",
         ]
         for kind in kinds:
-            actual = array.resample(time="1h").interpolate(kind)
+            kwargs = {}
+            if kind == "polynomial":
+                kwargs["order"] = 1
+            actual = array.resample(time="1h").interpolate(kind, **kwargs)
+            # using interp1d, polynomial order is to set directly in kind using int
             f = interp1d(
                 np.arange(len(times)),
                 data,
-                kind=kind,
+                kind=kwargs["order"] if kind == "polynomial" else kind,
                 axis=-1,
                 bounds_error=True,
                 assume_sorted=True,
@@ -2147,14 +2152,19 @@ class TestDataArrayResample:
             "slinear",
             "quadratic",
             "cubic",
+            "polynomial",
         ]
         for kind in kinds:
-            actual = array.chunk(chunks).resample(time="1h").interpolate(kind)
+            kwargs = {}
+            if kind == "polynomial":
+                kwargs["order"] = 1
+            actual = array.chunk(chunks).resample(time="1h").interpolate(kind, **kwargs)
             actual = actual.compute()
+            # using interp1d, polynomial order is to set directly in kind using int
             f = interp1d(
                 np.arange(len(times)),
                 data,
-                kind=kind,
+                kind=kwargs["order"] if kind == "polynomial" else kind,
                 axis=-1,
                 bounds_error=True,
                 assume_sorted=True,
