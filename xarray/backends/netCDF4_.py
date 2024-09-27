@@ -111,7 +111,7 @@ class NetCDF4ArrayWrapper(BaseNetCDF4Array):
             with self.datastore.lock:
                 original_array = self.get_array(needs_lock=False)
                 array = getitem(original_array, key)
-        except IndexError:
+        except IndexError as err:
             # Catch IndexError in netCDF4 and return a more informative
             # error message.  This is most often called when an unsorted
             # indexer is used before the data is loaded from disk.
@@ -120,7 +120,7 @@ class NetCDF4ArrayWrapper(BaseNetCDF4Array):
                 "is not valid on netCDF4.Variable object. Try loading "
                 "your data into memory first by calling .load()."
             )
-            raise IndexError(msg)
+            raise IndexError(msg) from err
         return array
 
 
@@ -192,7 +192,7 @@ def _nc4_require_group(ds, group, mode, create_group=_netcdf4_create_group):
                     ds = create_group(ds, key)
                 else:
                     # wrap error to provide slightly more helpful message
-                    raise OSError(f"group not found: {key}", e)
+                    raise OSError(f"group not found: {key}", e) from e
         return ds
 
 
@@ -278,7 +278,9 @@ def _extract_nc4_variable_encoding(
         chunksizes = encoding["chunksizes"]
         chunks_too_big = any(
             c > d and dim not in unlimited_dims
-            for c, d, dim in zip(chunksizes, variable.shape, variable.dims)
+            for c, d, dim in zip(
+                chunksizes, variable.shape, variable.dims, strict=False
+            )
         )
         has_original_shape = "original_shape" in encoding
         changed_shape = (
@@ -446,7 +448,9 @@ class NetCDF4DataStore(WritableCFDataStore):
             else:
                 encoding["contiguous"] = False
                 encoding["chunksizes"] = tuple(chunking)
-                encoding["preferred_chunks"] = dict(zip(var.dimensions, chunking))
+                encoding["preferred_chunks"] = dict(
+                    zip(var.dimensions, chunking, strict=True)
+                )
         # TODO: figure out how to round-trip "endian-ness" without raising
         # warnings from netCDF4
         # encoding['endian'] = var.endian()
@@ -615,7 +619,7 @@ class NetCDF4BackendEntrypoint(BackendEntrypoint):
             # netcdf 3 or HDF5
             return magic_number.startswith((b"CDF", b"\211HDF\r\n\032\n"))
 
-        if isinstance(filename_or_obj, (str, os.PathLike)):
+        if isinstance(filename_or_obj, str | os.PathLike):
             _, ext = os.path.splitext(filename_or_obj)
             return ext in {".nc", ".nc4", ".cdf"}
 
@@ -688,9 +692,34 @@ class NetCDF4BackendEntrypoint(BackendEntrypoint):
         autoclose=False,
         **kwargs,
     ) -> DataTree:
-        from xarray.backends.api import open_dataset
-        from xarray.backends.common import _iter_nc_groups
+
         from xarray.core.datatree import DataTree
+
+        groups_dict = self.open_groups_as_dict(filename_or_obj, **kwargs)
+
+        return DataTree.from_dict(groups_dict)
+
+    def open_groups_as_dict(
+        self,
+        filename_or_obj: str | os.PathLike[Any] | BufferedIOBase | AbstractDataStore,
+        *,
+        mask_and_scale=True,
+        decode_times=True,
+        concat_characters=True,
+        decode_coords=True,
+        drop_variables: str | Iterable[str] | None = None,
+        use_cftime=None,
+        decode_timedelta=None,
+        group: str | Iterable[str] | Callable | None = None,
+        format="NETCDF4",
+        clobber=True,
+        diskless=False,
+        persist=False,
+        lock=None,
+        autoclose=False,
+        **kwargs,
+    ) -> dict[str, Dataset]:
+        from xarray.backends.common import _iter_nc_groups
         from xarray.core.treenode import NodePath
 
         filename_or_obj = _normalize_path(filename_or_obj)
@@ -704,19 +733,20 @@ class NetCDF4BackendEntrypoint(BackendEntrypoint):
             lock=lock,
             autoclose=autoclose,
         )
+
+        # Check for a group and make it a parent if it exists
         if group:
             parent = NodePath("/") / NodePath(group)
         else:
             parent = NodePath("/")
 
         manager = store._manager
-        ds = open_dataset(store, **kwargs)
-        tree_root = DataTree.from_dict({str(parent): ds})
+        groups_dict = {}
         for path_group in _iter_nc_groups(store.ds, parent=parent):
             group_store = NetCDF4DataStore(manager, group=path_group, **kwargs)
             store_entrypoint = StoreBackendEntrypoint()
             with close_on_error(group_store):
-                ds = store_entrypoint.open_dataset(
+                group_ds = store_entrypoint.open_dataset(
                     group_store,
                     mask_and_scale=mask_and_scale,
                     decode_times=decode_times,
@@ -726,14 +756,10 @@ class NetCDF4BackendEntrypoint(BackendEntrypoint):
                     use_cftime=use_cftime,
                     decode_timedelta=decode_timedelta,
                 )
-                new_node: DataTree = DataTree(name=NodePath(path_group).name, data=ds)
-                tree_root._set_item(
-                    path_group,
-                    new_node,
-                    allow_overwrite=False,
-                    new_nodes_along_path=True,
-                )
-        return tree_root
+            group_name = str(NodePath(path_group))
+            groups_dict[group_name] = group_ds
+
+        return groups_dict
 
 
 BACKEND_ENTRYPOINTS["netcdf4"] = ("netCDF4", NetCDF4BackendEntrypoint)
