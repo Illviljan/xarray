@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import os
 import warnings
-from collections.abc import Callable, Iterable
+from collections.abc import Iterable
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -496,7 +496,6 @@ class ZarrStore(AbstractWritableDataStore):
         zarr_version=None,
         write_empty: bool | None = None,
     ):
-
         zarr_group, consolidate_on_close, close_store_on_close = _get_open_params(
             store=store,
             mode=mode,
@@ -542,7 +541,6 @@ class ZarrStore(AbstractWritableDataStore):
         zarr_version=None,
         write_empty: bool | None = None,
     ):
-
         zarr_group, consolidate_on_close, close_store_on_close = _get_open_params(
             store=store,
             mode=mode,
@@ -1282,7 +1280,7 @@ class ZarrBackendEntrypoint(BackendEntrypoint):
         drop_variables: str | Iterable[str] | None = None,
         use_cftime=None,
         decode_timedelta=None,
-        group: str | Iterable[str] | Callable | None = None,
+        group: str | None = None,
         mode="r",
         synchronizer=None,
         consolidated=None,
@@ -1328,7 +1326,7 @@ class ZarrBackendEntrypoint(BackendEntrypoint):
         drop_variables: str | Iterable[str] | None = None,
         use_cftime=None,
         decode_timedelta=None,
-        group: str | Iterable[str] | Callable | None = None,
+        group: str | None = None,
         mode="r",
         synchronizer=None,
         consolidated=None,
@@ -1338,7 +1336,6 @@ class ZarrBackendEntrypoint(BackendEntrypoint):
         zarr_version=None,
         **kwargs,
     ) -> dict[str, Dataset]:
-
         from xarray.core.treenode import NodePath
 
         filename_or_obj = _normalize_path(filename_or_obj)
@@ -1385,7 +1382,6 @@ class ZarrBackendEntrypoint(BackendEntrypoint):
 
 
 def _iter_zarr_groups(root: ZarrGroup, parent: str = "/") -> Iterable[str]:
-
     parent_nodepath = NodePath(parent)
     yield str(parent_nodepath)
     for path, group in root.groups():

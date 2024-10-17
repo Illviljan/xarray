@@ -3,7 +3,7 @@ from __future__ import annotations
 import functools
 import io
 import os
-from collections.abc import Callable, Iterable
+from collections.abc import Iterable
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -465,7 +465,7 @@ class H5netcdfBackendEntrypoint(BackendEntrypoint):
         use_cftime=None,
         decode_timedelta=None,
         format=None,
-        group: str | Iterable[str] | Callable | None = None,
+        group: str | None = None,
         lock=None,
         invalid_netcdf=None,
         phony_dims=None,
@@ -474,7 +474,6 @@ class H5netcdfBackendEntrypoint(BackendEntrypoint):
         driver_kwds=None,
         **kwargs,
     ) -> DataTree:
-
         from xarray.core.datatree import DataTree
 
         groups_dict = self.open_groups_as_dict(
@@ -511,7 +510,7 @@ class H5netcdfBackendEntrypoint(BackendEntrypoint):
         use_cftime=None,
         decode_timedelta=None,
         format=None,
-        group: str | Iterable[str] | Callable | None = None,
+        group: str | None = None,
         lock=None,
         invalid_netcdf=None,
         phony_dims=None,
@@ -520,7 +519,6 @@ class H5netcdfBackendEntrypoint(BackendEntrypoint):
         driver_kwds=None,
         **kwargs,
     ) -> dict[str, Dataset]:
-
         from xarray.backends.common import _iter_nc_groups
         from xarray.core.treenode import NodePath
         from xarray.core.utils import close_on_error
