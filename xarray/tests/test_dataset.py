@@ -297,9 +297,7 @@ class TestDataset:
                 var2     (dim1, dim2) float64 576B 1.162 -1.097 -2.123 ... 1.267 0.3328
                 var3     (dim3, dim1) float64 640B 0.5565 -0.2121 0.4563 ... -0.2452 -0.3616
             Attributes:
-                foo:      bar""".format(
-                data["dim3"].dtype
-            )
+                foo:      bar""".format(data["dim3"].dtype)
         )
         actual = "\n".join(x.rstrip() for x in repr(data).split("\n"))
         print(actual)
@@ -5615,7 +5613,7 @@ class TestDataset:
         data = create_test_data()
         with pytest.raises(
             ValueError,
-            match=r"Dimensions \('bad_dim',\) not found in data dimensions",
+            match=re.escape("Dimension(s) 'bad_dim' do not exist"),
         ):
             data.mean(dim="bad_dim")
 
@@ -5644,7 +5642,7 @@ class TestDataset:
         data = create_test_data()
         with pytest.raises(
             ValueError,
-            match=r"Dimensions \('bad_dim',\) not found in data dimensions",
+            match=re.escape("Dimension(s) 'bad_dim' do not exist"),
         ):
             getattr(data, func)(dim="bad_dim")
 
