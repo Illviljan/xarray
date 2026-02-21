@@ -54,6 +54,7 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "jupyter_sphinx",
+    "myst_parser",
     "nbsphinx",
     "sphinx_autosummary_accessors",
     "sphinx.ext.linkcode",
@@ -192,9 +193,7 @@ language = "en"
 project = "xarray"
 copyright = f"2014-{datetime.datetime.now().year}, xarray Developers"
 
-# The short Y.M.D version.
-v = packaging.version.parse(xarray.__version__)
-version = ".".join(str(p) for p in v.release)
+version = xarray.__version__
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -270,6 +269,10 @@ html_favicon = "_static/logos/Xarray_Icon_Final.svg"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 html_css_files = ["style.css"]
+
+linkcheck_exclude_documents = [
+    r'whats-new.*', # Allow broken links in old release notes
+]
 
 
 # configuration for sphinxext.opengraph
