@@ -1211,7 +1211,7 @@ class DataTreeAggregations:
         Group: /
             Dimensions:  (time: 6)
             Coordinates:
-              * time     (time) datetime64[ns] 48B 2001-01-31 2001-02-28 ... 2001-06-30
+              * time     (time) datetime64[us] 48B 2001-01-31 2001-02-28 ... 2001-06-30
                 labels   (time) <U1 24B 'a' 'b' 'c' 'c' 'b' 'a'
             Data variables:
                 foo      (time) float64 48B 1.0 3.0 6.0 6.0 8.0 8.0
@@ -1223,7 +1223,7 @@ class DataTreeAggregations:
         Group: /
             Dimensions:  (time: 6)
             Coordinates:
-              * time     (time) datetime64[ns] 48B 2001-01-31 2001-02-28 ... 2001-06-30
+              * time     (time) datetime64[us] 48B 2001-01-31 2001-02-28 ... 2001-06-30
                 labels   (time) <U1 24B 'a' 'b' 'c' 'c' 'b' 'a'
             Data variables:
                 foo      (time) float64 48B 1.0 3.0 6.0 6.0 8.0 nan
@@ -1321,7 +1321,7 @@ class DataTreeAggregations:
         Group: /
             Dimensions:  (time: 6)
             Coordinates:
-              * time     (time) datetime64[ns] 48B 2001-01-31 2001-02-28 ... 2001-06-30
+              * time     (time) datetime64[us] 48B 2001-01-31 2001-02-28 ... 2001-06-30
                 labels   (time) <U1 24B 'a' 'b' 'c' 'c' 'b' 'a'
             Data variables:
                 foo      (time) float64 48B 1.0 2.0 6.0 0.0 0.0 0.0
@@ -1333,7 +1333,7 @@ class DataTreeAggregations:
         Group: /
             Dimensions:  (time: 6)
             Coordinates:
-              * time     (time) datetime64[ns] 48B 2001-01-31 2001-02-28 ... 2001-06-30
+              * time     (time) datetime64[us] 48B 2001-01-31 2001-02-28 ... 2001-06-30
                 labels   (time) <U1 24B 'a' 'b' 'c' 'c' 'b' 'a'
             Data variables:
                 foo      (time) float64 48B 1.0 2.0 6.0 0.0 0.0 nan
@@ -2453,7 +2453,7 @@ class DatasetAggregations:
         <xarray.Dataset> Size: 120B
         Dimensions:  (time: 6)
         Coordinates:
-          * time     (time) datetime64[ns] 48B 2001-01-31 2001-02-28 ... 2001-06-30
+          * time     (time) datetime64[us] 48B 2001-01-31 2001-02-28 ... 2001-06-30
             labels   (time) <U1 24B 'a' 'b' 'c' 'c' 'b' 'a'
         Data variables:
             da       (time) float64 48B 1.0 3.0 6.0 6.0 8.0 8.0
@@ -2464,7 +2464,7 @@ class DatasetAggregations:
         <xarray.Dataset> Size: 120B
         Dimensions:  (time: 6)
         Coordinates:
-          * time     (time) datetime64[ns] 48B 2001-01-31 2001-02-28 ... 2001-06-30
+          * time     (time) datetime64[us] 48B 2001-01-31 2001-02-28 ... 2001-06-30
             labels   (time) <U1 24B 'a' 'b' 'c' 'c' 'b' 'a'
         Data variables:
             da       (time) float64 48B 1.0 3.0 6.0 6.0 8.0 nan
@@ -2556,7 +2556,7 @@ class DatasetAggregations:
         <xarray.Dataset> Size: 120B
         Dimensions:  (time: 6)
         Coordinates:
-          * time     (time) datetime64[ns] 48B 2001-01-31 2001-02-28 ... 2001-06-30
+          * time     (time) datetime64[us] 48B 2001-01-31 2001-02-28 ... 2001-06-30
             labels   (time) <U1 24B 'a' 'b' 'c' 'c' 'b' 'a'
         Data variables:
             da       (time) float64 48B 1.0 2.0 6.0 0.0 0.0 0.0
@@ -2567,7 +2567,7 @@ class DatasetAggregations:
         <xarray.Dataset> Size: 120B
         Dimensions:  (time: 6)
         Coordinates:
-          * time     (time) datetime64[ns] 48B 2001-01-31 2001-02-28 ... 2001-06-30
+          * time     (time) datetime64[us] 48B 2001-01-31 2001-02-28 ... 2001-06-30
             labels   (time) <U1 24B 'a' 'b' 'c' 'c' 'b' 'a'
         Data variables:
             da       (time) float64 48B 1.0 2.0 6.0 0.0 0.0 nan
@@ -5092,7 +5092,7 @@ class DatasetGroupByAggregations:
         <xarray.Dataset> Size: 120B
         Dimensions:  (time: 6)
         Coordinates:
-          * time     (time) datetime64[ns] 48B 2001-01-31 2001-02-28 ... 2001-06-30
+          * time     (time) datetime64[us] 48B 2001-01-31 2001-02-28 ... 2001-06-30
             labels   (time) <U1 24B 'a' 'b' 'c' 'c' 'b' 'a'
         Data variables:
             da       (time) float64 48B 1.0 2.0 3.0 3.0 4.0 1.0
@@ -5103,7 +5103,7 @@ class DatasetGroupByAggregations:
         <xarray.Dataset> Size: 120B
         Dimensions:  (time: 6)
         Coordinates:
-          * time     (time) datetime64[ns] 48B 2001-01-31 2001-02-28 ... 2001-06-30
+          * time     (time) datetime64[us] 48B 2001-01-31 2001-02-28 ... 2001-06-30
             labels   (time) <U1 24B 'a' 'b' 'c' 'c' 'b' 'a'
         Data variables:
             da       (time) float64 48B 1.0 2.0 3.0 3.0 4.0 nan
@@ -5217,7 +5217,7 @@ class DatasetGroupByAggregations:
         <xarray.Dataset> Size: 120B
         Dimensions:  (time: 6)
         Coordinates:
-          * time     (time) datetime64[ns] 48B 2001-01-31 2001-02-28 ... 2001-06-30
+          * time     (time) datetime64[us] 48B 2001-01-31 2001-02-28 ... 2001-06-30
             labels   (time) <U1 24B 'a' 'b' 'c' 'c' 'b' 'a'
         Data variables:
             da       (time) float64 48B 1.0 2.0 3.0 0.0 4.0 1.0
@@ -5228,7 +5228,7 @@ class DatasetGroupByAggregations:
         <xarray.Dataset> Size: 120B
         Dimensions:  (time: 6)
         Coordinates:
-          * time     (time) datetime64[ns] 48B 2001-01-31 2001-02-28 ... 2001-06-30
+          * time     (time) datetime64[us] 48B 2001-01-31 2001-02-28 ... 2001-06-30
             labels   (time) <U1 24B 'a' 'b' 'c' 'c' 'b' 'a'
         Data variables:
             da       (time) float64 48B 1.0 2.0 3.0 0.0 4.0 nan
@@ -6636,7 +6636,7 @@ class DatasetResampleAggregations:
         <xarray.Dataset> Size: 120B
         Dimensions:  (time: 6)
         Coordinates:
-          * time     (time) datetime64[ns] 48B 2001-01-31 2001-02-28 ... 2001-06-30
+          * time     (time) datetime64[us] 48B 2001-01-31 2001-02-28 ... 2001-06-30
             labels   (time) <U1 24B 'a' 'b' 'c' 'c' 'b' 'a'
         Data variables:
             da       (time) float64 48B 1.0 2.0 5.0 5.0 2.0 2.0
@@ -6647,7 +6647,7 @@ class DatasetResampleAggregations:
         <xarray.Dataset> Size: 120B
         Dimensions:  (time: 6)
         Coordinates:
-          * time     (time) datetime64[ns] 48B 2001-01-31 2001-02-28 ... 2001-06-30
+          * time     (time) datetime64[us] 48B 2001-01-31 2001-02-28 ... 2001-06-30
             labels   (time) <U1 24B 'a' 'b' 'c' 'c' 'b' 'a'
         Data variables:
             da       (time) float64 48B 1.0 2.0 5.0 5.0 2.0 nan
@@ -6761,7 +6761,7 @@ class DatasetResampleAggregations:
         <xarray.Dataset> Size: 120B
         Dimensions:  (time: 6)
         Coordinates:
-          * time     (time) datetime64[ns] 48B 2001-01-31 2001-02-28 ... 2001-06-30
+          * time     (time) datetime64[us] 48B 2001-01-31 2001-02-28 ... 2001-06-30
             labels   (time) <U1 24B 'a' 'b' 'c' 'c' 'b' 'a'
         Data variables:
             da       (time) float64 48B 1.0 2.0 6.0 0.0 2.0 2.0
@@ -6772,7 +6772,7 @@ class DatasetResampleAggregations:
         <xarray.Dataset> Size: 120B
         Dimensions:  (time: 6)
         Coordinates:
-          * time     (time) datetime64[ns] 48B 2001-01-31 2001-02-28 ... 2001-06-30
+          * time     (time) datetime64[us] 48B 2001-01-31 2001-02-28 ... 2001-06-30
             labels   (time) <U1 24B 'a' 'b' 'c' 'c' 'b' 'a'
         Data variables:
             da       (time) float64 48B 1.0 2.0 6.0 0.0 2.0 nan
@@ -9504,7 +9504,7 @@ class DataArrayResampleAggregations:
         <xarray.DataArray (time: 6)> Size: 48B
         array([1., 2., 5., 5., 2., 2.])
         Coordinates:
-          * time     (time) datetime64[ns] 48B 2001-01-31 2001-02-28 ... 2001-06-30
+          * time     (time) datetime64[us] 48B 2001-01-31 2001-02-28 ... 2001-06-30
             labels   (time) <U1 24B 'a' 'b' 'c' 'c' 'b' 'a'
 
         Use ``skipna`` to control whether NaNs are ignored.
@@ -9513,7 +9513,7 @@ class DataArrayResampleAggregations:
         <xarray.DataArray (time: 6)> Size: 48B
         array([ 1.,  2.,  5.,  5.,  2., nan])
         Coordinates:
-          * time     (time) datetime64[ns] 48B 2001-01-31 2001-02-28 ... 2001-06-30
+          * time     (time) datetime64[us] 48B 2001-01-31 2001-02-28 ... 2001-06-30
             labels   (time) <U1 24B 'a' 'b' 'c' 'c' 'b' 'a'
         """
         if (
@@ -9620,7 +9620,7 @@ class DataArrayResampleAggregations:
         <xarray.DataArray (time: 6)> Size: 48B
         array([1., 2., 6., 0., 2., 2.])
         Coordinates:
-          * time     (time) datetime64[ns] 48B 2001-01-31 2001-02-28 ... 2001-06-30
+          * time     (time) datetime64[us] 48B 2001-01-31 2001-02-28 ... 2001-06-30
             labels   (time) <U1 24B 'a' 'b' 'c' 'c' 'b' 'a'
 
         Use ``skipna`` to control whether NaNs are ignored.
@@ -9629,7 +9629,7 @@ class DataArrayResampleAggregations:
         <xarray.DataArray (time: 6)> Size: 48B
         array([ 1.,  2.,  6.,  0.,  2., nan])
         Coordinates:
-          * time     (time) datetime64[ns] 48B 2001-01-31 2001-02-28 ... 2001-06-30
+          * time     (time) datetime64[us] 48B 2001-01-31 2001-02-28 ... 2001-06-30
             labels   (time) <U1 24B 'a' 'b' 'c' 'c' 'b' 'a'
         """
         out = self.reduce(
